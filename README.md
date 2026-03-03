@@ -1,143 +1,512 @@
 # Monkey Programming Language
 
-A Go implementation of the Monkey programming language interpreter.
+A fully-featured tree-walking interpreter for the Monkey programming language, written in Go.
 
 ## Overview
 
-Monkey is a simple, dynamically-typed programming language with C-like syntax. This project implements a lexer, parser, and REPL (Read-Eval-Print Loop) for the Monkey language.
+Monkey is a dynamically-typed programming language with C-like syntax. This project implements a complete interpreter pipeline — **Lexer → Parser (Pratt) → AST → Evaluator** — along with an interactive REPL.
 
 ## Features
 
-### Current Implementation
-- **Lexical Analysis**: Complete tokenization of Monkey source code
-- **REPL**: Interactive command-line interface for testing
-- **Token Support**: Comprehensive token recognition including:
-    - Identifiers and literals
-    - Arithmetic operators (`+`, `-`, `*`, `/`)
-    - Comparison operators (`<`, `>`, `==`, `!=`)
-    - Assignment operator (`=`)
-    - Logical operators (`!`)
-    - Delimiters (`,`, `;`, `(`, `)`, `{`, `}`)
-    - Keywords (`let`, `fn`, `if`, `else`, `return`, `true`, `false`)
+- **Data Types**: Integers, Booleans, Strings, Arrays, Hash Maps
+- **Variable Bindings** with `let` statements
+- **Arithmetic & Comparison Expressions**
+- **Prefix & Infix Operators**
+- **Conditionals** (`if` / `else`)
+- **First-Class Functions** & Closures
+- **Higher-Order Functions**
+- **Built-in Functions**: `len`, `first`, `last`, `rest`, `push`, `puts`
+- **Array & Hash Map Literals** with index expressions
+- **String Concatenation**
+- **Error Handling** with descriptive messages
+- **Interactive REPL**
 
-### Language Features (Planned/In Development)
-- Variable bindings with `let` statements
-- Functions with `fn` keyword
-- Conditional expressions with `if/else`
-- Integer and boolean data types
-- Arithmetic and boolean expressions
-
-## Project Structure
-
-```
-monkey/
-├── ast/           # Abstract Syntax Tree definitions
-├── lexer/         # Lexical analyzer implementation
-├── parser/        # Parser implementation (in development)
-├── repl/          # Read-Eval-Print Loop
-├── token/         # Token definitions and utilities
-└── main.go        # Entry point
-```
+---
 
 ## Getting Started
 
 ### Prerequisites
+
 - Go 1.24.0 or later
 
 ### Installation
 
-1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd monkey
-```
-
-2. Build the project:
-```bash
 go build
 ```
 
-3. Run the REPL:
+### Run the REPL
+
 ```bash
 go run main.go
 ```
 
-### Usage
-
-Start the interactive REPL:
-```bash
-$ go run main.go
+```
 Hello <username>! This is the Monkey programming language!
 Feel free to type in commands
 >> 
 ```
 
-Try entering some expressions:
-```
->> let x = 5;
->> let y = 10;
->> fn(x, y) { x + y; }
->> if (5 < 10) { return true; } else { return false; }
-```
+### Run Tests
 
-The REPL will tokenize your input and display the generated tokens.
-
-## Example Monkey Code
-
-```javascript
-// Variable bindings
-let age = 1;
-let name = "Monkey";
-let result = 10 * (20 / 2);
-
-// Functions
-let add = fn(a, b) { return a + b; };
-let subtract = fn(a, b) { return a - b; };
-
-// Conditionals
-let max = fn(a, b) {
-    if (a > b) {
-        return a;
-    } else {
-        return b;
-    }
-};
-
-// Function calls
-let result = add(5, 3);
-let maximum = max(10, 15);
-```
-
-## Testing
-
-Run the test suite:
 ```bash
 go test ./...
 ```
 
-Run tests for a specific package:
-```bash
-go test ./lexer
-go test ./parser
+---
+
+## Language Guide
+
+### Variables
+
+Bind values with `let`. Statements end with a semicolon.
+
+```javascript
+let age = 25;
+let name = "Monkey";
+let pi = 3;
 ```
 
-## Development Status
+### Data Types
 
+| Type | Example |
+|---|---|
+| **Integer** | `42`, `-7`, `0` |
+| **Boolean** | `true`, `false` |
+| **String** | `"hello world"` |
+| **Array** | `[1, 2, 3]` |
+| **Hash Map** | `{"key": "value", 1: true}` |
+| **Function** | `fn(x) { x + 1 }` |
+| **Null** | returned implicitly (e.g. out-of-bounds access) |
 
-### 🚧⏳Under Construction
+### Operators
 
+#### Arithmetic
+
+```javascript
+>> 5 + 10
+15
+>> 10 - 3
+7
+>> 2 * 6
+12
+>> 10 / 2
+5
+```
+
+#### Comparison
+
+```javascript
+>> 1 < 2
+true
+>> 3 > 5
+false
+>> 1 == 1
+true
+>> 1 != 2
+true
+```
+
+#### Prefix
+
+```javascript
+>> -5
+-5
+>> !true
+false
+>> !false
+true
+```
+
+#### String Concatenation
+
+```javascript
+>> "Hello" + " " + "World!"
+Hello World!
+```
+
+### Conditionals
+
+`if` / `else` are expressions — they return a value.
+
+```javascript
+let x = 10;
+
+if (x > 5) {
+    "big";
+} else {
+    "small";
+}
+// => "big"
+```
+
+You can use them inline:
+
+```javascript
+let max = fn(a, b) {
+    if (a > b) { a } else { b }
+};
+
+>> max(3, 7)
+7
+```
+
+### Functions
+
+Functions are first-class values, created with `fn`. The last expression in the body is the implicit return value, or use `return` explicitly.
+
+```javascript
+let add = fn(a, b) { a + b };
+>> add(2, 3)
+5
+
+let factorial = fn(n) {
+    if (n == 0) {
+        return 1;
+    }
+    n * factorial(n - 1);
+};
+>> factorial(5)
+120
+```
+
+#### Closures
+
+Functions capture their enclosing environment:
+
+```javascript
+let newAdder = fn(x) {
+    fn(y) { x + y };
+};
+
+let addTwo = newAdder(2);
+>> addTwo(3)
+5
+```
+
+#### Higher-Order Functions
+
+Pass functions as arguments or return them:
+
+```javascript
+let apply = fn(f, x) { f(x) };
+let double = fn(x) { x * 2 };
+
+>> apply(double, 5)
+10
+```
+
+#### Immediately Invoked Functions
+
+```javascript
+>> fn(x) { x * x }(4)
+16
+```
+
+### Arrays
+
+Arrays are ordered, zero-indexed lists that can hold values of any type.
+
+```javascript
+let arr = [1, "two", true, fn(x) { x }];
+
+>> arr[0]
+1
+>> arr[1]
+two
+>> arr[3](42)
+42
+```
+
+Out-of-bounds access returns `null`:
+
+```javascript
+>> [1, 2, 3][99]
+null
+>> [1, 2, 3][-1]
+null
+```
+
+### Hash Maps
+
+Hash maps are key-value collections. Keys can be strings, integers, or booleans.
+
+```javascript
+let people = {"name": "Monkey", "age": 1, true: "yes"};
+
+>> people["name"]
+Monkey
+>> people["age"]
+1
+>> people[true]
+yes
+```
+
+Missing keys return `null`:
+
+```javascript
+>> {}["missing"]
+null
+```
+
+Use expressions as keys and values:
+
+```javascript
+let key = "name";
+let data = {key: "Monkey", "score": 10 * 5};
+
+>> data["name"]
+Monkey
+>> data["score"]
+50
+```
+
+### Built-in Functions
+
+#### `len(arg)`
+
+Returns the length of a string or array.
+
+```javascript
+>> len("hello")
+5
+>> len([1, 2, 3])
+3
+>> len("")
+0
+>> len([])
+0
+```
+
+Errors on unsupported types:
+
+```javascript
+>> len(1)
+ERROR: argument to `len` not supported, got INTEGER
+>> len("a", "b")
+ERROR: wrong number of arguments. got=2, want=1
+```
+
+#### `first(arr)`
+
+Returns the first element of an array, or `null` if empty.
+
+```javascript
+>> first([10, 20, 30])
+10
+>> first([])
+null
+```
+
+#### `last(arr)`
+
+Returns the last element of an array, or `null` if empty.
+
+```javascript
+>> last([10, 20, 30])
+30
+>> last([])
+null
+```
+
+#### `rest(arr)`
+
+Returns a **new** array with the first element removed, or `null` if empty.
+
+```javascript
+>> rest([1, 2, 3])
+[2, 3]
+>> rest([1])
+[]
+>> rest([])
+null
+```
+
+#### `push(arr, value)`
+
+Returns a **new** array with the value appended. Does **not** mutate the original.
+
+```javascript
+>> let a = [1, 2];
+>> let b = push(a, 3);
+>> b
+[1, 2, 3]
+>> a
+[1, 2]
+```
+
+#### `puts(args...)`
+
+Prints each argument on a new line. Returns `null`.
+
+```javascript
+>> puts("Hello", "World")
+Hello
+World
+null
+```
+
+### Loops (via Recursion)
+
+Monkey has no `for` or `while` keywords. Loops are expressed through **recursive functions**, which is natural since Monkey supports closures and tail calls.
+
+#### Counting
+
+```javascript
+let countdown = fn(n) {
+    if (n < 1) {
+        return 0;
+    }
+    puts(n);
+    countdown(n - 1);
+};
+
+>> countdown(3)
+3
+2
+1
+```
+
+#### Iterating Over an Array
+
+Use `first`, `rest`, and recursion:
+
+```javascript
+let forEach = fn(arr, f) {
+    if (len(arr) > 0) {
+        f(first(arr));
+        forEach(rest(arr), f);
+    }
+};
+
+>> forEach([1, 2, 3], fn(x) { puts(x * 2) })
+2
+4
+6
+```
+
+#### Map (Transform Each Element)
+
+```javascript
+let map = fn(arr, f) {
+    let iter = fn(arr, acc) {
+        if (len(arr) == 0) {
+            return acc;
+        }
+        iter(rest(arr), push(acc, f(first(arr))));
+    };
+    iter(arr, []);
+};
+
+>> map([1, 2, 3], fn(x) { x * x })
+[1, 4, 9]
+```
+
+#### Reduce / Fold
+
+```javascript
+let reduce = fn(arr, initial, f) {
+    if (len(arr) == 0) {
+        return initial;
+    }
+    reduce(rest(arr), f(initial, first(arr)), f);
+};
+
+let sum = fn(arr) {
+    reduce(arr, 0, fn(acc, el) { acc + el });
+};
+
+>> sum([1, 2, 3, 4, 5])
+15
+```
+
+#### Filter
+
+```javascript
+let filter = fn(arr, pred) {
+    let iter = fn(arr, acc) {
+        if (len(arr) == 0) {
+            return acc;
+        }
+        if (pred(first(arr))) {
+            iter(rest(arr), push(acc, first(arr)));
+        } else {
+            iter(rest(arr), acc);
+        }
+    };
+    iter(arr, []);
+};
+
+>> filter([1, 2, 3, 4, 5], fn(x) { x > 2 })
+[3, 4, 5]
+```
+
+---
+
+## Complete Example
+
+A program that computes the sum of squares from an array:
+
+```javascript
+let numbers = [1, 2, 3, 4, 5];
+
+let reduce = fn(arr, initial, f) {
+    if (len(arr) == 0) {
+        return initial;
+    }
+    reduce(rest(arr), f(initial, first(arr)), f);
+};
+
+let result = reduce(numbers, 0, fn(acc, n) { acc + n * n });
+
+>> result
+55
+```
+
+---
+
+## Project Structure
+
+```
+monkey/
+├── ast/             # Abstract Syntax Tree node definitions
+│   ├── ast.go
+│   └── ast_test.go
+├── evaluator/       # Tree-walking evaluator
+│   ├── evaluator.go
+│   ├── builtins.go
+│   └── evaluator_test.go
+├── lexer/           # Lexical analyzer (tokenizer)
+│   ├── lexer.go
+│   └── lexer_test.go
+├── object/          # Internal object system (values at runtime)
+│   ├── object.go
+│   └── environment.go
+├── parser/          # Pratt parser (recursive descent)
+│   ├── parser.go
+│   ├── parser_tracing.go
+│   └── parser_test.go
+├── repl/            # Read-Eval-Print Loop
+│   └── repl.go
+├── token/           # Token type definitions
+│   └── token.go
+├── main.go          # Entry point
+├── go.mod
+└── README.md
+```
 
 ## Token Types
 
-The lexer recognizes the following token types:
-
 | Category | Tokens |
-|----------|---------|
-| **Literals** | `IDENT`, `INT` |
+|---|---|
+| **Literals** | `IDENT`, `INT`, `STRING` |
 | **Operators** | `+`, `-`, `*`, `/`, `=`, `!`, `<`, `>`, `==`, `!=` |
-| **Delimiters** | `(`, `)`, `{`, `}`, `,`, `;` |
+| **Delimiters** | `(`, `)`, `{`, `}`, `[`, `]`, `,`, `;`, `:` |
 | **Keywords** | `let`, `fn`, `if`, `else`, `return`, `true`, `false` |
 | **Special** | `EOF`, `ILLEGAL` |
 
+---
 
-**Note**: This is a learning project implementing an interpreter. The Monkey language is designed for educational purposes to understand interpreter design and implementation.
+**Note**: This is a learning project implementing a tree-walking interpreter. The Monkey language is designed for educational purposes to understand lexing, parsing (Pratt parsing), ASTs, and evaluation.
