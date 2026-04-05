@@ -23,10 +23,10 @@ Monkey is a dynamically-typed programming language with C-like syntax. This proj
 
 ```mermaid
 flowchart LR
-    U[User] -->|types Monkey code| FE[Frontend<br/>React + Vite<br/>(monkey-playground)<br/>Hosted on Vercel]
-    FE -->|POST /api/run (code)| API[Backend API<br/>Spring Boot<br/>(monkey-api)<br/>Hosted on Railway]
-    API -->|spawn: monkey-server --stdin| BIN[Interpreter binary<br/>Go<br/>(monkey-server)]
-    BIN -->|stdout JSON (output,error)| API
+    U[User] -->|types Monkey code| FE[Frontend: React + Vite on Vercel]
+    FE -->|POST /api/run with code| API[Backend API: Spring Boot on Railway]
+    API -->|spawn monkey-server --stdin| BIN[Interpreter: Go monkey-server]
+    BIN -->|stdout JSON output,error| API
     API -->|JSON response| FE
     FE -->|renders output/errors| U
 ```
