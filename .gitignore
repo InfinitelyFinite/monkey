@@ -2,14 +2,11 @@
 .DS_Store
 Thumbs.db
 
-# VS Code
 .vscode/
-
-# IntelliJ / JetBrains
 .idea/
 *.iml
 
-# ===== Go =====
+# ===== Go (this repo root) =====
 *.exe
 *.exe~
 *.dll
@@ -17,20 +14,35 @@ Thumbs.db
 *.dylib
 *.test
 *.out
-coverage*
+
+# Common Go coverage outputs
+coverage.out
+coverage.txt
+cover.out
+
+# Go build artifacts (if you build into these folders)
 bin/
 dist/
+
+# Built binary checked in by accident
 /monkey-server
-/monkey/monkey-server        # in case built inside the monkey/ subdirectory
 
-# ===== Java (Maven) =====
-**/target/
-*.jar                        # don't commit built jars
+# ===== Java / Maven (monkey-api) =====
+monkey-api/target/
 
-# ===== Node / Vite =====
+# Eclipse/STS metadata (if used)
+monkey-api/.classpath
+monkey-api/.project
+monkey-api/.settings/
+
+# ===== Node / Vite (monkey-playground) =====
 monkey-playground/node_modules/
 monkey-playground/dist/
 monkey-playground/.vite/
+
+# Vite/Node caches & coverage (if present)
+monkey-playground/.cache/
+monkey-playground/coverage/
 
 # Logs
 npm-debug.log*
@@ -38,9 +50,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Local env files
-.env.local
-.env.*.local
-
-# Cache
-.cache/
+# Env files (kept under monkey-playground/)
+monkey-playground/.env
+monkey-playground/.env.*
+!monkey-playground/.env.example
+!monkey-playground/.env.template
