@@ -1,0 +1,7 @@
+monkey-playground/
+node_modules/
+**/node_modules/
+.git/
+target/
+**/target/
+*.md
