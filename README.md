@@ -1,10 +1,121 @@
-# Monkey Programming Language
+# Monkey Playground (Interpreter + API + Web UI)
 
-A fully-featured tree-walking interpreter for the Monkey programming language, written in Go.
+**Try it live:** https://monkeyplayground.vercel.app/
+
+This repository contains:
+
+- A full **Monkey** interpreter written in **Go** (lexer → parser → AST → evaluator)
+- A production-ready **HTTP API** (Spring Boot) that executes Monkey code safely by spawning the Go binary
+- A **React + Vite** web playground UI
+
+**Hosted:** Frontend on **Vercel**, backend on **Railway**.
 
 ## Overview
 
-Monkey is a dynamically-typed programming language with C-like syntax. This project implements a complete interpreter pipeline — **Lexer → Parser (Pratt) → AST → Evaluator** — along with an interactive REPL.
+Monkey is a dynamically-typed programming language with C-like syntax. This project implements a complete interpreter pipeline — **Lexer → Parser (Pratt) → AST → Evaluator** — along with:
+
+- a web playground (copy/paste code, run, see output/errors)
+- an API layer that runs untrusted snippets with a hard timeout
+
+## Architecture (How the Playground Works)
+
+### High-level system diagram
+
+```mermaid
+flowchart LR
+    U[User] -->|types Monkey code| FE[Frontend<br/>React + Vite<br/>(monkey-playground)<br/>Hosted on Vercel]
+    FE -->|POST /api/run (code)| API[Backend API<br/>Spring Boot<br/>(monkey-api)<br/>Hosted on Railway]
+    API -->|spawn: monkey-server --stdin| BIN[Interpreter binary<br/>Go<br/>(monkey-server)]
+    BIN -->|stdout JSON (output,error)| API
+    API -->|JSON response| FE
+    FE -->|renders output/errors| U
+```
+
+### Request/response sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Browser as Browser (Vercel)
+    participant Api as Monkey API (Railway)
+    participant Bin as monkey-server (Go binary)
+
+    Browser->>Api: POST /api/run { code }
+    Api->>Bin: start process: monkey-server --stdin
+    Api->>Bin: write source code to stdin
+    Bin-->>Api: stdout JSON (output,error)
+    Api-->>Browser: 200 OK { output, error }
+    Browser-->>Browser: display output or error
+```
+
+### Interpreter pipeline (inside the Go binary)
+
+```mermaid
+flowchart TB
+    SRC[Monkey source code] --> LEX[Lexer - tokenizer]
+    LEX --> PAR[Parser - Pratt]
+    PAR --> AST[AST - program tree]
+    AST --> EVAL[Evaluator - tree-walking]
+    EVAL --> ENV[Environment - bindings]
+    EVAL --> OBJ[Objects - runtime values]
+    EVAL --> OUT[Result and captured puts stdout]
+```
+
+## Repo Components
+
+- **Interpreter (Go):** the language implementation and CLI entrypoint.
+- **`monkey-server` binary (Go):** built from the repo root; supports:
+    - `--stdin`: read one program from stdin and print a single JSON object to stdout
+    - `--server`: optional HTTP mode (`POST /run`) returning `{output,error}`
+- **API (Java/Spring):** `POST /api/run` validates input, spawns the binary, enforces a timeout, and returns JSON.
+- **Playground (React/Vite):** editor + examples + output panel; calls the API.
+
+## Quickstart (Run the Web Playground Locally)
+
+### 1) Run the backend API (Spring Boot)
+
+The API spawns the Go binary (`monkey-server`) on each request.
+
+```bash
+# from repo root
+go build -o monkey-server .
+
+cd monkey-api
+
+# point the API at the local binary (default is /app/monkey-server)
+MONKEY_BINARY_PATH=../monkey-server ./mvnw spring-boot:run
+```
+
+The API starts on `http://localhost:8081` by default.
+
+**Limits:** the API accepts up to 10,000 characters of source code per request and enforces a default 10s execution timeout.
+
+### 2) Run the frontend (Vite)
+
+```bash
+cd monkey-playground
+npm install
+npm run dev
+```
+
+In dev mode the frontend calls `/api/run` and Vite proxies it to `http://localhost:8081`.
+
+### Environment variables (deployment)
+
+- **Frontend:** set `VITE_API_URL` to your backend base URL (the UI calls `${VITE_API_URL}/api/run` in production).
+- **Backend:**
+    - `PORT` (server port; Railway typically sets this)
+    - `MONKEY_BINARY_PATH` (path to `monkey-server`)
+    - `MONKEY_EXECUTION_TIMEOUT` (seconds; defaults to 10)
+
+### Docker (backend)
+
+The root `Dockerfile` produces a single container image that includes both the Spring Boot API and the `monkey-server` Go binary.
+
+```bash
+docker build -t monkey-backend .
+docker run --rm -p 8080:8080 monkey-backend
+```
 
 ## Features
 
@@ -23,7 +134,7 @@ Monkey is a dynamically-typed programming language with C-like syntax. This proj
 
 ---
 
-## Getting Started
+## Getting Started (Interpreter CLI)
 
 ### Prerequisites
 
