@@ -1,0 +1,46 @@
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# IntelliJ / JetBrains
+.idea/
+*.iml
+
+# ===== Go =====
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage*
+bin/
+dist/
+/monkey-server
+/monkey/monkey-server        # in case built inside the monkey/ subdirectory
+
+# ===== Java (Maven) =====
+**/target/
+*.jar                        # don't commit built jars
+
+# ===== Node / Vite =====
+monkey-playground/node_modules/
+monkey-playground/dist/
+monkey-playground/.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env files
+.env.local
+.env.*.local
+
+# Cache
+.cache/

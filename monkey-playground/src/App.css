@@ -1,0 +1,186 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body,
+html,
+#root {
+  height: 100%;
+  background: #0f0f1a;
+  color: #e0e0e0;
+  font-family: system-ui, sans-serif;
+}
+
+.app-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1a1a2e;
+  padding: 0 20px;
+  border-bottom: 1px solid #2a2a4a;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #a78bfa;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panels {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-panel {
+  flex: 55;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #2a2a4a;
+  overflow: hidden;
+}
+
+.output-panel {
+  flex: 45;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.btn-run {
+  background: #7c3aed;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn-run:hover {
+  background: #6d28d9;
+}
+
+.btn-run:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-clear {
+  background: transparent;
+  color: #888;
+  border: 1px solid #333;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn-clear:hover {
+  border-color: #444;
+  color: #aaa;
+}
+
+.select {
+  background: #0f0f1a;
+  color: #e0e0e0;
+  border: 1px solid #2a2a4a;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #7c3aed;
+}
+
+.output-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background: #0d0d0d;
+}
+
+.output-success {
+  color: #86efac;
+  white-space: pre-wrap;
+}
+
+.output-error {
+  color: #f87171;
+  white-space: pre-wrap;
+}
+
+.output-ready {
+  color: #4a4a6a;
+  font-style: italic;
+}
+
+.output-footer {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #1a1a2e;
+  background: #0d0d0d;
+}
+
+.output-loading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #e0e0e0;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(124, 58, 237, 0.25);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.editor-container {
+  flex: 1;
+  height: 100%;
+}
+
+.editor-container .cm-editor {
+  height: 100%;
+}
+
+.editor-container .cm-scroller {
+  overflow: auto;
+}
